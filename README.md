@@ -3,7 +3,7 @@ A tool to help practice memorizing using People Action Object (POA) techniques
 
 # Getting started
 
-    sudo yum install -y python3
+    sudo yum install -y python3 python-virtualenvwrapper
     mkvirtualenv -v /usr/bin/python3
     pip install click
     
