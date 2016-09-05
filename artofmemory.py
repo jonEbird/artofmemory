@@ -3,6 +3,7 @@
 import click
 import itertools
 import random
+from lib.common import MOST_COMMON_WORDS
 
 #  Numeral Associated Consonants   Mnemonic
 #  0   s, z, soft c    z is the first letter of zero. The other letters have a similar sound.
@@ -64,9 +65,9 @@ def convert_word_to_major(word):
     value = ''
     for c in word:
         for i,letters in letter_to_integer.items():
-            if c in letters:
+            if c.lower() in letters:
                 value += str(i)
-    return value
+    return int(value)
                 
         
     
@@ -110,9 +111,17 @@ def main(major_system, cards):
         suit = list(Card.suits.keys())[random.randint(0, 3)]
         print(Card(value, suit))
     if major_system:
-       words = open('/usr/share/dict/words').read().split()
-       word = list(words)[random.randint(0, len(words) - 1)]
-       print('{0} => {1}'.format(word, convert_word_to_major(word)) )
+        # words = open('/usr/share/dict/words').read().split()
+        words = MOST_COMMON_WORDS
+        while True:
+            word = list(words)[random.randint(0, len(words) - 1)]
+            #print('{0} =>'.format(word, end=''))
+            guess = input('{0} => '.format(word, end=''))
+            major_value = convert_word_to_major(word)
+            if guess == major_value:
+                print('CORRECT!')
+            else:
+                print('INCORRECT: {0}'.format(major_value))
 
 if __name__ == '__main__':
     main()

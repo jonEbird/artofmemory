@@ -1,1 +1,3 @@
 *.py.swp
+*.gitignore.swp
+__pycache__
