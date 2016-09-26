@@ -223,6 +223,7 @@ def _do_main(major_system,
     elif poa:
         play_poa(config) 
     else:
+        # TODO -- Print out proper click help test
         print('click HELP')
 
 
