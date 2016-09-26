@@ -9,19 +9,6 @@ import re
 
 from lib.common import MOST_COMMON_WORDS
 
-#  Numeral Associated Consonants   Mnemonic
-#  0   s, z, soft c    z is the first letter of zero. The other letters have a similar sound.
-#  1   t, d    d & t have one downstroke and sound similar (some variant systems include "th")
-#  2   n   n has two downstrokes and looks something like "2" on its side
-#  3   m   M has three downstrokes and looks like a 3 on its side
-#  4   r   last letter of four, also 4 and R are almost mirror images of each other
-#  5   l   L is the Roman Numeral for 50
-#  6   sh, soft ch, j, soft g, zh  a script j has a lower loop / g is almost a 6 flipped over
-#  7   k, hard c, hard g, hard ch, q, qu   capital K "contains" two sevens
-#  8   f, v    script f resembles a figure-8. V sounds similar. (some variant systems include th)
-#  9   p, b    p is a mirror-image 9. b sounds similar and resembles a 9 rolled around
-#  Unassigned  Vowel sounds, w,h,y These can be used anywhere without changing a word's number value
-
 default_major_map = {0: ['s', 'z'],
                         1: ['t', 'd'],
                         2: ['n'],
@@ -63,6 +50,7 @@ def get_artofmemory_config(filename):
         print('Unable to read config file: {}'.format(fname))
     return config
 
+
 def build_regex_from_letter_mapping(major_map):
     '''
     Given a dictionary of number to character mappings, return a regular
@@ -77,6 +65,7 @@ def build_regex_from_letter_mapping(major_map):
     regex = '({})'.format('|'.join(sorted_letters))
     
     return regex
+
 
 def convert_word_to_major(word, major_map=default_major_map):
     '''
@@ -148,7 +137,8 @@ class Card(object):
 
 def play_major_system(game='words', letter_mapping=default_major_map):
     '''
-    
+    Play a simple game using the major system to convert words to their
+    major numeric equivalent
     '''
     words = MOST_COMMON_WORDS
     correct = 0
@@ -212,6 +202,7 @@ def _do_main(major_system,
                 letters,
                 cards,
                 poa,
+                print_conf,
                 filename):
 
     config = get_artofmemory_config(filename)
@@ -219,6 +210,13 @@ def _do_main(major_system,
         value = random.randint(1,13)
         suit = list(Card.suits.keys())[random.randint(0, 3)]
         print(Card(value, suit))
+    elif print_conf:
+        try:
+            with open(os.path.expanduser(filename)) as of:
+                print(of.read())
+        except IOError:
+            print('Failed to read config')
+
     elif major_system:
         game = 'letters' if letters else 'words'
         play_major_system(game)
@@ -227,14 +225,16 @@ def _do_main(major_system,
     else:
         print('click HELP')
 
+
 @click.command()
 @click.option('--major-system', is_flag=True)
 @click.option('--letters', is_flag=True)
 @click.option('--cards', is_flag=True)
 @click.option('--poa', is_flag=True)
+@click.option('--print-conf', is_flag=True)
 @click.option('--filename', type=str, default='~/.artofmemory.conf')
-def main(major_system, letters, cards, poa, filename):
-    _do_main(major_system, letters, cards, poa, filename)
+def main(major_system, letters, cards, poa, print_conf, filename):
+    _do_main(major_system, letters, cards, poa, print_conf, filename)
 
 
 if __name__ == '__main__':
