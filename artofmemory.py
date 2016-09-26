@@ -56,7 +56,11 @@ def get_artofmemory_config(filename):
     @return ConfigParser            ConfigParser object
     '''
     config = configparser.ConfigParser()
-    config.readfp(open(os.path.expanduser(filename)))
+    fname = os.path.expanduser(filename)
+    try:
+        config.readfp(open(fname))
+    except IOError as e:
+        print('Unable to read config file: {}'.format(fname))
     return config
 
 def build_regex_from_letter_mapping(major_map):
@@ -106,7 +110,7 @@ def convert_word_to_major(word, major_map=default_major_map):
         for i,letters in major_map.items():
             if piece.lower() in letters:
                 value += str(i)
-    return int(value)
+    return value
             
     
 
@@ -141,6 +145,7 @@ class Card(object):
         # TODO(shuff): Add proper colors
         return "{0}{1.suit}".format(self.values[self.value], self)
 
+
 def play_major_system(game='words', letter_mapping=default_major_map):
     '''
     
@@ -163,7 +168,7 @@ def play_major_system(game='words', letter_mapping=default_major_map):
         major_value = convert_word_to_major(word)
         if not guess:
             continue
-        if int(guess) == major_value:
+        if guess == str(major_value):
             print('CORRECT!')
             correct += 1
         else:
@@ -203,16 +208,13 @@ def play_poa(config, shuffle=False):
         total += 1
        
 
+def _do_main(major_system,
+                letters,
+                cards,
+                poa,
+                filename):
 
-@click.command()
-@click.option('--major-system', is_flag=True)
-@click.option('--letters', is_flag=True)
-@click.option('--cards', is_flag=True)
-@click.option('--poa', is_flag=True)
-@click.option('--filename', type=str, default='~/.artofmemory.conf')
-def main(major_system, letters, cards, poa, filename):
     config = get_artofmemory_config(filename)
-    print(config)
     if cards:
         value = random.randint(1,13)
         suit = list(Card.suits.keys())[random.randint(0, 3)]
@@ -224,6 +226,16 @@ def main(major_system, letters, cards, poa, filename):
         play_poa(config) 
     else:
         print('click HELP')
+
+@click.command()
+@click.option('--major-system', is_flag=True)
+@click.option('--letters', is_flag=True)
+@click.option('--cards', is_flag=True)
+@click.option('--poa', is_flag=True)
+@click.option('--filename', type=str, default='~/.artofmemory.conf')
+def main(major_system, letters, cards, poa, filename):
+    _do_main(major_system, letters, cards, poa, filename)
+
 
 if __name__ == '__main__':
     main()
