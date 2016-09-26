@@ -170,6 +170,10 @@ def play_poa(config, shuffle=False):
     Test out your POA skills.  It supports just testing your POA + shuffling
     them up to test combos
     '''
+    # TODO -- add an option to limit the values to test
+    # e.g. if I only want to test POA for 1 through 4
+
+    # TODO add support for properly mixing up the POA and testing
     if 'poa' not in config.sections():
         print('No POA Config setup.  See README')
 
