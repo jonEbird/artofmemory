@@ -11,15 +11,15 @@ import click
 from lib.common import MOST_COMMON_WORDS
 
 default_major_map = {0: ['s', 'z'],
-                        1: ['t', 'd'],
-                        2: ['n'],
-                        3: ['m'],
-                        4: ['r'],
-                        5: ['l'],
-                        6: ['j', 'g'],
-                        7: ['c', 'k', 'q'],
-                        8: ['v', 'f'],
-                        9: ['p', 'b']}
+                     1: ['t', 'd'],
+                     2: ['n'],
+                     3: ['m'],
+                     4: ['r'],
+                     5: ['l'],
+                     6: ['j', 'g'],
+                     7: ['c', 'k', 'q'],
+                     8: ['v', 'f'],
+                     9: ['p', 'b']}
 
 major_letters = list(itertools.chain(*default_major_map.values()))
 
@@ -47,7 +47,7 @@ def get_artofmemory_config(filename):
     fname = os.path.expanduser(filename)
     try:
         config.readfp(open(fname))
-    except IOError as e:
+    except IOError:
         print('Unable to read config file: {}'.format(fname))
     return config
 
@@ -57,23 +57,23 @@ def build_regex_from_letter_mapping(major_map):
     Given a dictionary of number to character mappings, return a regular
     expression that can be used to break it up
     '''
-    
+
     all_letters = itertools.chain(*major_map.values())
-    
+
     sorted_letters = sorted(all_letters, key=lambda x: len(x), reverse=True)
-    
+
     # This will looks like '(th|ch|sh|k|....)
     regex = '({})'.format('|'.join(sorted_letters))
-    
+
     return regex
 
 
 def convert_word_to_major(word, major_map=default_major_map):
     '''
-    Given a word, convert it to the major system.  
-    
+    Given a word, convert it to the major system.
+
     Here is the approximte major system
-    
+
     Digit   Letter
     0   s, z
     1   t, d, th
@@ -85,50 +85,46 @@ def convert_word_to_major(word, major_map=default_major_map):
     7   c, k, g, q, ck
     8   v, f, ph
     9   p, b
-    
+
     e.g. satellite => 0151
-    
+
     @param  word        Word to convert
     @returns    int     Integer value of given word
     '''
-    
-    
     regex = build_regex_from_letter_mapping(major_map)
-    
+
     value = ''
     for piece in re.findall(regex, word):
-        for i,letters in major_map.items():
+        for i, letters in major_map.items():
             if piece.lower() in letters:
                 value += str(i)
     return value
-            
-    
+
 
 class Card(object):
     suits = {'club': '\u2663',
-               'spade': '\u2660',
-               'heart': '\u2764',
-               'diamond': '\u2666',
-    }
+             'spade': '\u2660',
+             'heart': '\u2764',
+             'diamond': '\u2666',
+             }
 
     values = {1: 'A',
-                2: '2',
-                3: '3',
-                4: '4',
-                5: '5',
-                6: '6',
-                7: '7',
-                8: '8',
-                9: '9',
-                10: '10',
-                11: 'J',
-                12: 'Q',
-                13: 'K',
-    }
+              2: '2',
+              3: '3',
+              4: '4',
+              5: '5',
+              6: '6',
+              7: '7',
+              8: '8',
+              9: '9',
+              10: '10',
+              11: 'J',
+              12: 'Q',
+              13: 'K',
+              }
 
     def __init__(self, value, suit):
         self.value = value
-        
         self.suit = self.suits[suit]
 
     def __repr__(self):
@@ -166,6 +162,7 @@ def play_major_system(game='words', letter_mapping=default_major_map):
             print('INCORRECT: {}'.format(major_value))
         total += 1
 
+
 def play_poa(config, shuffle=False):
     '''
     Test out your POA skills.  It supports just testing your POA + shuffling
@@ -179,7 +176,7 @@ def play_poa(config, shuffle=False):
         print('No POA Config setup.  See README')
 
     poa_section = config['poa']
-        
+
     poa_mapping = list(poa_section.items())
 
     correct = 0
@@ -201,18 +198,18 @@ def play_poa(config, shuffle=False):
         else:
             print('INCORRECT: {}'.format(number))
         total += 1
-       
+
 
 def _do_main(major_system,
-                letters,
-                cards,
-                poa,
-                print_conf,
-                filename):
+             letters,
+             cards,
+             poa,
+             print_conf,
+             filename):
 
     config = get_artofmemory_config(filename)
     if cards:
-        value = random.randint(1,13)
+        value = random.randint(1, 13)
         suit = list(Card.suits.keys())[random.randint(0, 3)]
         print(Card(value, suit))
     elif print_conf:
@@ -226,7 +223,7 @@ def _do_main(major_system,
         game = 'letters' if letters else 'words'
         play_major_system(game)
     elif poa:
-        play_poa(config) 
+        play_poa(config)
     else:
         # TODO -- Print out proper click help test
         print('click HELP')
@@ -245,4 +242,3 @@ def main(major_system, letters, cards, poa, print_conf, filename):
 
 if __name__ == '__main__':
     main()
-
