@@ -1,22 +1,11 @@
+import unittest
+
 from artofmemory import (
     convert_word_to_major,
     build_regex_from_letter_mapping,
+    default_major_map,
 )
 
-# Here is a stub major mapping so testing is consistent
-default_major_map = {0: ['s', 'z'],
-                        1: ['t', 'd'],
-                        2: ['n'],
-                        3: ['m'],
-                        4: ['r'],
-                        5: ['l'],
-                        6: ['j', 'g'],
-                        7: ['c', 'k', 'q'],
-                        8: ['v', 'f'],
-                        9: ['p', 'b']}
-
-
-import unittest
 
 class TestArtOfMemory(unittest.TestCase):
     '''
@@ -29,7 +18,7 @@ class TestArtOfMemory(unittest.TestCase):
     def test_word_with_ph(self):
         ret = convert_word_to_major('phone')
         self.assertEqual(ret, '92')
-       
+
     def test_word_with_ch(self):
         ret = convert_word_to_major('chad')
         self.assertEqual(ret, '71')
@@ -57,6 +46,3 @@ class TestArtOfMemory(unittest.TestCase):
     def test_regex_builder_full(self):
         ret = build_regex_from_letter_mapping(default_major_map)
         self.assertEqual(ret, '(s|z|t|d|n|m|r|l|j|g|c|k|q|v|f|p|b)')
-
-if __name__ == '__main__':
-    unittest.main()

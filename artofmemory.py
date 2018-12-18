@@ -1,11 +1,12 @@
 #!/bin/env python3
 
-import click
 import configparser
 import itertools
 import os
 import random
 import re
+
+import click
 
 from lib.common import MOST_COMMON_WORDS
 
