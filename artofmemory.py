@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
 import configparser
 import itertools
@@ -9,6 +9,7 @@ import re
 import click
 
 from lib.common import MOST_COMMON_WORDS
+from lib.cards import Card
 
 default_major_map = {0: ['s', 'z'],
                      1: ['t', 'd'],
@@ -24,18 +25,6 @@ default_major_map = {0: ['s', 'z'],
 major_letters = list(itertools.chain(*default_major_map.values()))
 
 
-class Person(object):
-    pass
-
-
-class Action(object):
-    pass
-
-
-class Object(object):
-    pass
-
-
 def get_artofmemory_config(filename):
     '''
     Given a filename, return a configparser object with the config contents
@@ -46,7 +35,7 @@ def get_artofmemory_config(filename):
     config = configparser.ConfigParser()
     fname = os.path.expanduser(filename)
     try:
-        config.readfp(open(fname))
+        config.read_file(open(fname))
     except IOError:
         print('Unable to read config file: {}'.format(fname))
     return config
@@ -101,37 +90,6 @@ def convert_word_to_major(word, major_map=default_major_map):
     return value
 
 
-class Card(object):
-    suits = {'club': '\u2663',
-             'spade': '\u2660',
-             'heart': '\u2764',
-             'diamond': '\u2666',
-             }
-
-    values = {1: 'A',
-              2: '2',
-              3: '3',
-              4: '4',
-              5: '5',
-              6: '6',
-              7: '7',
-              8: '8',
-              9: '9',
-              10: '10',
-              11: 'J',
-              12: 'Q',
-              13: 'K',
-              }
-
-    def __init__(self, value, suit):
-        self.value = value
-        self.suit = self.suits[suit]
-
-    def __repr__(self):
-        # TODO(shuff): Add proper colors
-        return "{0}{1.suit}".format(self.values[self.value], self)
-
-
 def play_major_system(game='words', letter_mapping=default_major_map):
     '''
     Play a simple game using the major system to convert words to their
@@ -163,47 +121,65 @@ def play_major_system(game='words', letter_mapping=default_major_map):
         total += 1
 
 
-def play_poa(config, shuffle=False):
-    '''
-    Test out your POA skills.  It supports just testing your POA + shuffling
-    them up to test combos
+def flatten_pao(d):
+    """Yield back (num, item) tuples for each PAO broken into items.
+
+    The PAO item will be prefixed with either 'p:', 'a:', 'o:' to help denote its part of
+    the overall PAO.
+
+    Args:
+        d (dict): dictionary-like object that supports .items()
+    Yields:
+        (str, str)
+    """
+    for num, pao in d.items():
+        person, action, obj = pao.split(',')
+        yield (num, "p:" + person.strip())
+        yield (num, "a:" + action.strip())
+        yield (num, "o:" + obj.strip())
+
+
+def play_pao(config, shuffle=False):
+    '''Test out your Person Action Object (PAO) skills.
+
+    It supports just testing your PAO + shuffling them up to test combos
     '''
     # TODO -- add an option to limit the values to test
-    # e.g. if I only want to test POA for 1 through 4
+    # e.g. if I only want to test PAO for 1 through 4
 
-    # TODO add support for properly mixing up the POA and testing
-    if 'poa' not in config.sections():
-        print('No POA Config setup.  See README')
+    # TODO add support for properly mixing up the PAO and testing
+    if 'pao' not in config.sections():
+        print('No PAO Config setup.  See README')
+        return
 
-    poa_section = config['poa']
-
-    poa_mapping = list(poa_section.items())
+    pao_pairs = list(flatten_pao(config['pao']))
 
     correct = 0
     total = 0
-    while True:
-        # Grab a random section
-        number, poa = poa_mapping[random.randint(0, len(poa_mapping) - 1)]
-        poa = ' '.join(poa.split(','))
-        try:
-            guess = input('{}\n=> '.format(poa))
-        except KeyboardInterrupt:
+    try:
+        while True:
+            # Randomize the PAO items
+            random.shuffle(pao_pairs)
+
+            for number, item in pao_pairs:
+                guess = input('{}\n=> '.format(item))
+                if not guess:
+                    continue
+                if guess == number:
+                    print('CORRECT!')
+                    correct += 1
+                else:
+                    print('INCORRECT: {}'.format(number))
+                total += 1
+    except KeyboardInterrupt:
+        if total:
             print('\n{:>2}% Correct'.format(correct / float(total) * 100))
-            break
-        if not guess:
-            continue
-        if guess == number:
-            print('CORRECT!')
-            correct += 1
-        else:
-            print('INCORRECT: {}'.format(number))
-        total += 1
 
 
 def _do_main(major_system,
              letters,
              cards,
-             poa,
+             pao,
              print_conf,
              filename):
 
@@ -222,8 +198,8 @@ def _do_main(major_system,
     elif major_system:
         game = 'letters' if letters else 'words'
         play_major_system(game)
-    elif poa:
-        play_poa(config)
+    elif pao:
+        play_pao(config)
     else:
         # TODO -- Print out proper click help test
         print('click HELP')
@@ -233,11 +209,11 @@ def _do_main(major_system,
 @click.option('--major-system', is_flag=True)
 @click.option('--letters', is_flag=True)
 @click.option('--cards', is_flag=True)
-@click.option('--poa', is_flag=True)
+@click.option('--pao', is_flag=True)
 @click.option('--print-conf', is_flag=True)
 @click.option('--filename', type=str, default='~/.artofmemory.conf')
-def main(major_system, letters, cards, poa, print_conf, filename):
-    _do_main(major_system, letters, cards, poa, print_conf, filename)
+def main(major_system, letters, cards, pao, print_conf, filename):
+    _do_main(major_system, letters, cards, pao, print_conf, filename)
 
 
 if __name__ == '__main__':
