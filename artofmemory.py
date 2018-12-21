@@ -8,8 +8,10 @@ import re
 
 import click
 
-from lib.common import MOST_COMMON_WORDS
+from lib.data import words, bible
 from lib.cards import Card
+from lib.terminal import LineRepeater
+
 
 default_major_map = {0: ['s', 'z'],
                      1: ['t', 'd'],
@@ -23,6 +25,14 @@ default_major_map = {0: ['s', 'z'],
                      9: ['p', 'b']}
 
 major_letters = list(itertools.chain(*default_major_map.values()))
+
+
+def say(phrase, voice="Tessa"):
+    """Say the phrase out loud.
+    """
+    # TODO: Support more platforms than just MacOS
+    if os.uname()[0] == 'Darwin':
+        os.system("say -v %s %s" % (voice, phrase))
 
 
 def get_artofmemory_config(filename):
@@ -95,12 +105,12 @@ def play_major_system(game='words', letter_mapping=default_major_map):
     Play a simple game using the major system to convert words to their
     major numeric equivalent
     '''
-    words = MOST_COMMON_WORDS
+    common_words = words.MOST_COMMON_WORDS[:]
     correct = 0
     total = 0
     while True:
         if game == 'words':
-            word = list(words)[random.randint(0, len(words) - 1)]
+            word = list(common_words)[random.randint(0, len(common_words) - 1)]
         elif game == 'letters':
             word = major_letters[random.randint(0, len(major_letters) - 1)]
 
@@ -176,14 +186,41 @@ def play_pao(config, shuffle=False):
             print('\n{:>2}% Correct'.format(correct / float(total) * 100))
 
 
+def play_quiz_missing(items, talk=False):
+    """Leaving one out, print rest in random order, then ask for what is missing.
+    """
+    try:
+        shuffled = items[:]
+        random.shuffle(shuffled)
+
+        total = len(shuffled)
+        last_item = shuffled.pop()
+        term = LineRepeater()
+        for n, item in enumerate(shuffled):
+            if talk:
+                say(item)
+            term.write("%2d/%d: %s" % (n, total, item))
+
+        if talk:
+            say("Okay, what is missing?")
+        ans = input("What is missing? ")
+        if ans.lower() == last_item.lower():
+            print("Well done!")
+        else:
+            print("Sorry, it was '%s'." % last_item)
+    except KeyboardInterrupt:
+        print("\nOkay, we can quiz another time.")
+
+
 def _do_main(major_system,
              letters,
              cards,
              pao,
+             quiz,
              print_conf,
+             talk,
              filename):
 
-    config = get_artofmemory_config(filename)
     if cards:
         value = random.randint(1, 13)
         suit = list(Card.suits.keys())[random.randint(0, 3)]
@@ -199,7 +236,10 @@ def _do_main(major_system,
         game = 'letters' if letters else 'words'
         play_major_system(game)
     elif pao:
+        config = get_artofmemory_config(filename)
         play_pao(config)
+    elif quiz:
+        play_quiz_missing(bible.old_testament + bible.new_testament, talk=talk)
     else:
         # TODO -- Print out proper click help test
         print('click HELP')
@@ -210,10 +250,12 @@ def _do_main(major_system,
 @click.option('--letters', is_flag=True)
 @click.option('--cards', is_flag=True)
 @click.option('--pao', is_flag=True)
+@click.option('--quiz', is_flag=True)
 @click.option('--print-conf', is_flag=True)
+@click.option('--talk', is_flag=True)
 @click.option('--filename', type=str, default='~/.artofmemory.conf')
-def main(major_system, letters, cards, pao, print_conf, filename):
-    _do_main(major_system, letters, cards, pao, print_conf, filename)
+def main(major_system, letters, cards, pao, quiz, print_conf, talk, filename):
+    _do_main(major_system, letters, cards, pao, quiz, print_conf, talk, filename)
 
 
 if __name__ == '__main__':
