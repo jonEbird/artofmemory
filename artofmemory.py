@@ -107,7 +107,7 @@ def play_major_system(game="words", letter_mapping=default_major_map):
             word = major_letters[random.randint(0, len(major_letters) - 1)]
 
         try:
-            guess = input("{} => ".format(word, end=""))
+            guess = input("{} => ".format(word), end="")
         except KeyboardInterrupt:
             print("\n{:>2}% Correct".format(correct / float(total) * 100))
             break
