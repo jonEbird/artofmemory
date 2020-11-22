@@ -8,7 +8,7 @@ import re
 
 import click
 
-from lib.common import MOST_COMMON_WORDS
+from lib.words import COMMON_WORDS_EN
 from lib.cards import Card
 
 default_major_map = {
@@ -97,7 +97,7 @@ def play_major_system(game="words", letter_mapping=default_major_map):
     Play a simple game using the major system to convert words to their
     major numeric equivalent
     """
-    words = MOST_COMMON_WORDS
+    words = COMMON_WORDS_EN
     correct = 0
     total = 0
     while True:
