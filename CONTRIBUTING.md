@@ -30,6 +30,16 @@ To view the coverage report, run:
 
     make coverage
 
+# Linting
+
+Primary linter for code is handled by [flake8][].
+Configuration for flake8 can be found in [setup.cfg](setup.cfg).
+
+We also use [black][], the uncompromising code formatter, to keep style both automated and reviews un-opinionated.
+See the [Editor Setup][black-setup] guide for how to setup black within your Editor to make automatic formatting as you code.
+But otherwise, if you wish for it to apply changes, you can run:
+
+    black .
 
 [pyenv]: https://github.com/pyenv/pyenv
 [direnv]: https://github.com/direnv/direnv
