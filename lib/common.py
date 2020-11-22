@@ -1,5 +1,4 @@
-
-MOST_COMMON_WORDS = '''
+MOST_COMMON_WORDS = """
 the
 of
 to
@@ -999,4 +998,4 @@ meant
 quotient
 teeth
 shell
-neck'''.split()
+neck""".split()
