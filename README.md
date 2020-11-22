@@ -1,13 +1,13 @@
-# artofmemory
-A tool to help practice memorization techniques such as using People Action Object (PAO) techniques
+# Art of Memory
+
+A tool to help practice memorization techniques such as using People Action Object (PAO) techniques.
 
 # Getting started
 
-    sudo yum install -y python3 python-virtualenvwrapper
-    mkvirtualenv -v /usr/bin/python3
-    pip install -r requirements.txt  # requirements-test.txt if planning to run tests
+See the [Environment Setup](CONTRIBUTING.md) section of the contributing guide for setup.
+Then try executing `artofmemory.py`:
 
-    python3 artofmemory.py
+    python artofmemory.py
 
 You will also need to setup a `.artofmemory.conf` file in your home directory or in this
 local directory. Its contents only requires a `[pao]` section consisting of numbers -to->
@@ -21,13 +21,5 @@ Here is a starter example:
 
 # Examples
 
-    python3 artofmemory.py --cards
-    python3 artofmemory.py --major-system
-
-# Development
-
-When setting up your environment, use the `requirements-test.txt` file for installing requirements.
-
-Recommended way to execute tests:
-
-    make test
+    python artofmemory.py --cards
+    python artofmemory.py --major-system
