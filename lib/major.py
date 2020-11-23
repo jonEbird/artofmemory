@@ -85,7 +85,8 @@ def basic_quiz(use_letters: bool = True, letter_mapping=default_major_map):
         try:
             guess = input("{} => ".format(word))
         except KeyboardInterrupt:
-            print("\n{:>2}% Correct".format(correct / float(total) * 100))
+            if total:
+                print("\n{:>2}% Correct".format(correct / float(total) * 100))
             break
 
         major_value = convert_word_to_major(word)
