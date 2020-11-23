@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 
 
 class Card(object):
@@ -32,3 +33,10 @@ class Card(object):
     def __repr__(self):
         # TODO(shuff): Add proper colors
         return "{0}{1.suit}".format(self.values[self.value], self)
+
+
+def random_card():
+    """Print out a random Card."""
+    value = random.randint(1, 13)
+    suit = list(Card.suits.keys())[random.randint(0, 3)]
+    print(Card(value, suit))

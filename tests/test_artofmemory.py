@@ -1,6 +1,6 @@
 import unittest
 
-from artofmemory import (
+from lib.major import (
     convert_word_to_major,
     build_regex_from_letter_mapping,
     default_major_map,
