@@ -1,10 +1,6 @@
 import unittest
 
-from lib.major import (
-    convert_word_to_major,
-    build_regex_from_letter_mapping,
-    default_major_map,
-)
+from lib.major import NaiveMajorSystem
 
 
 class TestArtOfMemory(unittest.TestCase):
@@ -13,37 +9,39 @@ class TestArtOfMemory(unittest.TestCase):
     """
 
     def test_ts(self):
-        ret = convert_word_to_major("test")
+        ret = NaiveMajorSystem().word_to_major("test")
         self.assertEqual(ret, "101")
 
     def test_word_with_ph(self):
-        ret = convert_word_to_major("phone")
+        ret = NaiveMajorSystem().word_to_major("phone")
         self.assertEqual(ret, "92")
 
     def test_word_with_ch(self):
-        ret = convert_word_to_major("chad")
+        ret = NaiveMajorSystem().word_to_major("chad")
         self.assertEqual(ret, "71")
 
     def test_word_with_ck(self):
-        ret = convert_word_to_major("jack")
+        ret = NaiveMajorSystem().word_to_major("jack")
         self.assertEqual(ret, "677")
 
     def test_word_with_sh(self):
-        ret = convert_word_to_major("shut")
+        ret = NaiveMajorSystem().word_to_major("shut")
         self.assertEqual(ret, "01")
 
     def test_word_with_th(self):
-        ret = convert_word_to_major("the")
+        ret = NaiveMajorSystem().word_to_major("the")
         self.assertEqual(ret, "1")
 
     def test_word_with_double_letter(self):
-        ret = convert_word_to_major("basketball")
+        ret = NaiveMajorSystem().word_to_major("basketball")
         self.assertEqual(ret, "9071955")
 
     def test_regex_builder_empty(self):
-        ret = build_regex_from_letter_mapping(dict())
+        ms = NaiveMajorSystem()
+        ms.MAPPING = {}
+        ret = ms._regex_from_letter_mapping()
         self.assertEqual(ret, "()")
 
     def test_regex_builder_full(self):
-        ret = build_regex_from_letter_mapping(default_major_map)
+        ret = NaiveMajorSystem()._regex_from_letter_mapping()
         self.assertEqual(ret, "(s|z|t|d|n|m|r|l|j|g|c|k|q|v|f|p|b)")
