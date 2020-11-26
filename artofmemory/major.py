@@ -1,7 +1,7 @@
 import itertools
 import random
 import re
-from typing import List
+from typing import List, Tuple
 
 import pronouncing
 
@@ -54,6 +54,11 @@ class PhonemesMajorSystem(object):
         # pronouncing.lookup is a dict mapping of the word to the phonemes
 
         # 83 should match "FM" and "VM"
+
+        # FIXME: This whole implementation is basically a special form of
+        #        pronouncing.search() and hence needs to call .init_cmu(). Ideally this
+        #        detail is not needed.
+        pronouncing.init_cmu()
 
         pattern = "^"
         for n in map(int, re.findall(r"\d", number)):
@@ -162,3 +167,10 @@ def basic_quiz(use_letters: bool = True, use_naive: bool = False):
             if total:
                 print("\n{:>2}% Correct".format(correct / float(total) * 100))
             break
+
+
+def print_number_words(numbers: Tuple[str]) -> None:
+    """Print out a series of possible words that can match the given numbers."""
+    major = PhonemesMajorSystem()
+    for number in numbers:
+        print(f"{number}: {', '.join(major.number_to_words(number))}")

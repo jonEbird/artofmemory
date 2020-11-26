@@ -5,7 +5,7 @@ import os
 import click
 
 from artofmemory.cards import random_card
-from artofmemory.major import basic_quiz
+from artofmemory.major import basic_quiz, print_number_words
 from artofmemory.pao import pao_quiz
 
 
@@ -43,6 +43,13 @@ def pao(config_file):
         return
 
     pao_quiz(fname)
+
+
+@quiz.command("words")  # FIXME: ideally not grouped with "quiz"
+@click.argument("numbers", nargs=-1)
+def major_system_words(numbers):
+    """Print out a possible words that match given number(s)."""
+    print_number_words(numbers)
 
 
 if __name__ == "__main__":

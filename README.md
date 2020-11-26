@@ -21,5 +21,9 @@ Here is a starter example:
 
 # Examples
 
-    python play.py --cards
-    python play.py --major-system
+    ./play.py --cards
+    ./play.py --major-system
+
+Find a list of words that match the number `903` and `42`:
+
+    ./play.py words 903 42
