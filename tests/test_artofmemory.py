@@ -1,11 +1,11 @@
 import unittest
 
-from lib.major import NaiveMajorSystem
+from artofmemory.major import NaiveMajorSystem
 
 
 class TestArtOfMemory(unittest.TestCase):
     """
-    Test all the things in artofmemory.py
+    Test all the things in artofmemory
     """
 
     def test_ts(self):

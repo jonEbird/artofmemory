@@ -1,6 +1,6 @@
 """Ensure testing of the Major System does what we expect"""
 
-from lib.major import NaiveMajorSystem, PhonemesMajorSystem
+from artofmemory.major import NaiveMajorSystem, PhonemesMajorSystem
 
 
 def test_office():

@@ -5,9 +5,9 @@ A tool to help practice memorization techniques such as using People Action Obje
 # Getting started
 
 See the [Environment Setup](CONTRIBUTING.md) section of the contributing guide for setup.
-Then try executing `artofmemory.py`:
+Then try executing `play.py`:
 
-    python artofmemory.py
+    ./play.py
 
 You will also need to setup a `.artofmemory.conf` file in your home directory or in this
 local directory. Its contents only requires a `[pao]` section consisting of numbers -to->
@@ -21,5 +21,5 @@ Here is a starter example:
 
 # Examples
 
-    python artofmemory.py --cards
-    python artofmemory.py --major-system
+    python play.py --cards
+    python play.py --major-system

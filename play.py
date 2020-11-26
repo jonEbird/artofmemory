@@ -4,9 +4,9 @@ import os
 
 import click
 
-from lib.cards import random_card
-from lib.major import basic_quiz
-from lib.pao import pao_quiz
+from artofmemory.cards import random_card
+from artofmemory.major import basic_quiz
+from artofmemory.pao import pao_quiz
 
 
 @click.group()
