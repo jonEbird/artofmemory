@@ -8,7 +8,51 @@ import pronouncing
 from .data.words import COMMON_WORDS_EN
 
 
-class PhonemesMajorSystem(object):
+class MajorSystem(object):
+    """The Major system is a peg system for numbers <--> words.
+
+    It is a system where each digit has one or more consonants that can represent it. You
+    can then substitute digits in a number for letters and fill in whichever vowels you'd
+    like to form words. When a consonant is not included in the system, it also can be
+    used as filler letters such as 'w' or 'h'.
+
+    When there are multiple constants for a digit, it is because they both roughly make
+    the same sound when pronounced. Lets take the digit 1 for which we can substitute
+    either 'd' or 't'. When you make the sound of either letter, your mouth and tongue are
+    positioned the same and hence are considered equivalent in this system.
+
+    Here is the mapping:
+
+    0 -> s, z, soft 'c'
+    1 -> d, t
+    2 -> n
+    3 -> m
+    4 -> r
+    5 -> l
+    6 -> j, ch, sh, soft 'g'
+    7 -> hard 'c', k, hard 'g'
+    8 -> f, v
+    9 -> b, p
+
+    Examples:
+
+    letter => 514
+    You do not repeat the 1 even though there are two 't's because the sound you make is
+    just a single 't' sound.
+
+    circle => 0475
+    The first 'c' is soft, so you use a 0 which sounds like 's' and the second 'c' is
+    hard.
+    """
+
+    def word_to_major(self, word: str) -> str:
+        raise NotImplementedError
+
+    def number_to_words(self, number: str) -> List[str]:
+        raise NotImplementedError
+
+
+class PhonemesMajorSystem(MajorSystem):
     """An implementation of the major system that uses phonemes.
 
     Breaks up words based on their actual phonetic sounds (phonemes).
@@ -17,7 +61,7 @@ class PhonemesMajorSystem(object):
     MAPPING = {
         0: ["S", "Z"],
         1: ["T", "D"],
-        2: ["N"],  # "NG" as in "finger"?
+        2: ["N", "NG"],  # Including "NG" as in "finger"
         3: ["M"],
         4: ["R", "ER0", "ER1"],
         5: ["L"],
@@ -78,7 +122,7 @@ class PhonemesMajorSystem(object):
         return matches
 
 
-class NaiveMajorSystem(object):
+class NaiveMajorSystem(MajorSystem):
     """A naive implementation of the major system.
 
     Does not consider differences between soft and hard sounding consonants.
@@ -133,44 +177,51 @@ class NaiveMajorSystem(object):
         return value
 
 
-def basic_quiz(use_letters: bool = True, use_naive: bool = False):
+def basic_quiz(use_letters: bool = False):
     """Quiz converting words to major numeric equivalent"""
     game = "letters" if use_letters else "words"
 
-    if use_naive:
-        major_system = NaiveMajorSystem()
-    else:
-        major_system = PhonemesMajorSystem()
+    major_system = PhonemesMajorSystem()
 
     words = COMMON_WORDS_EN
     correct = 0
     total = 0
     while True:
+        if game == "words":
+            word = random.choice(words)
+        elif game == "letters":
+            word = str(random.choice(list(NaiveMajorSystem.MAPPING.keys())))
+        major_value = major_system.word_to_major(word)
+
         try:
-            if game == "words":
-                word = random.choice(words)
-            elif game == "letters":
-                word = str(random.choice(list(NaiveMajorSystem.MAPPING.keys())))
-            major_value = major_system.word_to_major(word)
-
             guess = input("{} => ".format(word))
-            if not guess:
-                continue
-            if guess == str(major_value):
-                print("Correct!")
-                correct += 1
-            else:
-                print("Nope, it is {}".format(major_value))
-            total += 1
-
-        except KeyboardInterrupt:
-            if total:
-                print("\n{:>2}% Correct".format(correct / float(total) * 100))
+        except (EOFError, KeyboardInterrupt):
             break
+
+        if guess == str(major_value):
+            print("Correct!")
+            correct += 1
+        else:
+            print("Nope, it is {}".format(major_value))
+        total += 1
+
+    if total:
+        print("\n{:>2}% Correct".format(correct / float(total) * 100))
+
+
+def explain() -> str:
+    """Provide an explanation summary of the system"""
+    return "\n".join(map(lambda l: l.lstrip(), str(MajorSystem.__doc__).split("\n")))
 
 
 def print_number_words(numbers: Tuple[str]) -> None:
     """Print out a series of possible words that can match the given numbers."""
     major = PhonemesMajorSystem()
+
     for number in numbers:
-        print(f"{number}: {', '.join(major.number_to_words(number))}\n")
+        if number.isdigit():
+            print(f"{number}: {', '.join(major.number_to_words(number))}\n")
+        else:
+            # looking to translate the word
+            word = number
+            print(f"{word}: {major.word_to_major(word)}\n")
