@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
-import os
 import sys
 import tty
 import termios
 
 
 class LineRepeater(object):
-    """Utility class to print a line to the terminal and then erase it again.
-    """
+    """Utility class to print a line to the terminal and then erase it again."""
+
     def __init__(self):
         self.__max_line = 0
 
@@ -34,7 +33,7 @@ class LineRepeater(object):
             self.__max_line = len(line)
         else:
             # Erase prior max length with spaces
-            print('{}{}'.format(' ' * self.__max_line, '\b' * self.__max_line), end='')
-        print(line, end='')
+            print("{}{}".format(" " * self.__max_line, "\b" * self.__max_line), end="")
+        print(line, end="")
         self.get_key()
-        print('\b' * len(line), end='')
+        print("\b" * len(line), end="")

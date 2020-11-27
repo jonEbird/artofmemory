@@ -1,13 +1,13 @@
-# artofmemory
-A tool to help practice memorization techniques such as using People Action Object (PAO) techniques
+# Art of Memory
+
+A tool to help practice memorization techniques such as using People Action Object (PAO) techniques.
 
 # Getting started
 
-    sudo yum install -y python3 python-virtualenvwrapper
-    mkvirtualenv -v /usr/bin/python3
-    pip install -r requirements.txt  # requirements-test.txt if planning to run tests
+See the [Environment Setup](CONTRIBUTING.md) section of the contributing guide for setup.
+Then try executing `play.py`:
 
-    python3 artofmemory.py
+    ./play.py
 
 You will also need to setup a `.artofmemory.conf` file in your home directory or in this
 local directory. Its contents only requires a `[pao]` section consisting of numbers -to->
@@ -21,13 +21,14 @@ Here is a starter example:
 
 # Examples
 
-    python3 artofmemory.py --cards
-    python3 artofmemory.py --major-system
+    ./play.py --cards
+    ./play.py --major-system
 
-# Development
+Find a list of words that match the number `903` and `42`:
 
-When setting up your environment, use the `requirements-test.txt` file for installing requirements.
+    ./play.py words 903 42
+    seq 0 99 | xargs ./play.py words  # generate words for 0..99
 
-Recommended way to execute tests:
+Quiz yourself if you can keep track of all of the books of the Bible and after being told all but one, tell what is missing:
 
-    make test
+    ./play.py bible
