@@ -63,9 +63,9 @@ def person_action_object(config_file, explain: bool, quiz: bool):
 @cli.command("words")
 @click.option("--quiz", help="Quiz how well you know things", is_flag=True)
 @click.option("--explain", help="Include explanation", is_flag=True)
-@click.option("--summary", help="Show a large summary from 00 -> 99", is_flag=True)
+@click.option("--nouns", help="Filter words to be only nouns", is_flag=True)
 @click.argument("numbers", nargs=-1)
-def major_system_words(numbers, summary: bool, explain: bool, quiz: bool):
+def major_system_words(numbers, nouns: bool, explain: bool, quiz: bool):
     """Print out a possible words that match given number(s)"""
     if explain:
         click.echo(major.explain())
@@ -73,12 +73,27 @@ def major_system_words(numbers, summary: bool, explain: bool, quiz: bool):
     if quiz:
         major.basic_quiz()
     elif numbers:
-        major.print_number_words(numbers)
-    elif summary:
-        click.echo(major.explain())
-        major.print_number_words(
-            list(map(str, range(0, 10))) + list(map(lambda n: f"{n:02}", range(0, 100)))
-        )
+        major.print_number_words(numbers, nouns_only=nouns)
+
+
+@cli.command()
+@click.option("--nouns", help="Filter words to be only nouns", is_flag=True)
+@click.option("--max", "max_", help="Maximum number", metavar="INT", default=100)
+@click.option("--min", "min_", help="Minimum number", metavar="INT", default=0)
+def words_summary(min_: int, max_: int, nouns: bool):
+    """Show a large summary of words defaulting from 00 -> 99"""
+    click.echo(major.explain())
+
+    input_numbers = []
+    # single digit numbers first
+    for n in range(min_, max_):
+        if -1 < n < 10:
+            input_numbers.append(str(n))
+    # then apply double digits
+    for n in range(min_, max_):
+        input_numbers.append(f"{n:02}")
+
+    major.print_number_words(input_numbers, nouns_only=nouns)
 
 
 if __name__ == "__main__":

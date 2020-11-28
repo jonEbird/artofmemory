@@ -41,13 +41,21 @@ Find a list of words that match the number `903` and `42`:
 
     ./aom.py words 903 42
 
-Or get a rather large summary page with numbers from 00 to 99:
-
-    ./aom.py words --summary > words.txt
-
 See how you might encode a message into numbers:
 
     ./aom.py words such great words
+
+### Number Summary
+
+To get a large summary of numbers to words, use the `words-summary` command which defaults to generating words for numbers between 00 to 99.
+You can change the range via `--min` and/or `--max` arguments.
+Since nouns are easier to make an image of in your head, you can ask the results to be limited to only nouns via `--nouns` option.
+
+    ./aom.py words-summary --nouns
+
+If you do use the `--nouns` option, you _may_ need to pull down the `NLTK` wordnet database of words:
+
+    python -c 'import nltk; nltk.download("wordnet")'
 
 ## Missing word
 

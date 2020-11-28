@@ -4,6 +4,7 @@ import re
 from typing import List, Tuple
 
 import pronouncing
+from nltk.corpus import wordnet as wn
 
 from .data.words import COMMON_WORDS_EN
 
@@ -214,13 +215,19 @@ def explain() -> str:
     return "\n".join(map(lambda l: l.lstrip(), str(MajorSystem.__doc__).split("\n")))
 
 
-def print_number_words(numbers: Tuple[str]) -> None:
+def print_number_words(numbers: Tuple[str], nouns_only: bool = False) -> None:
     """Print out a series of possible words that can match the given numbers."""
     major = PhonemesMajorSystem()
 
+    if nouns_only:
+        nouns = {x.name().split(".", 1)[0] for x in wn.all_synsets("n")}
+
     for number in numbers:
         if number.isdigit():
-            print(f"{number}: {', '.join(major.number_to_words(number))}\n")
+            words = major.number_to_words(number)
+            if nouns_only:
+                words = list(filter(lambda word: word in nouns, words))
+            print(f"{number}: {', '.join(words)}\n")
         else:
             # looking to translate the word
             word = number
