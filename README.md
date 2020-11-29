@@ -53,7 +53,11 @@ Since nouns are easier to make an image of in your head, you can ask the results
 
     ./aom.py words-summary --nouns
 
-If you do use the `--nouns` option, you _may_ need to pull down the `NLTK` wordnet database of words:
+You can even print the summary of words in an [org-mode][] friendly output:
+
+    ./aom.py words-summary --org-mode --nouns
+
+If you do use the `--nouns` option, you need to pull down the `NLTK` wordnet database of words if not already:
 
     python -c 'import nltk; nltk.download("wordnet")'
 
@@ -74,3 +78,5 @@ Or pass in your own choices:
 
 For now this is a bit of a stub.
 Can only print out a random card for now.
+
+[org-mode]: https://orgmode.org/

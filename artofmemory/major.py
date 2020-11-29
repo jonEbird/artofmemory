@@ -1,7 +1,9 @@
 import itertools
 import random
 import re
-from typing import List, Tuple
+import textwrap
+from contextlib import contextmanager
+from typing import Any, List, Optional, Set, Tuple
 
 import pronouncing
 from nltk.corpus import wordnet as wn
@@ -213,6 +215,99 @@ def basic_quiz(use_letters: bool = False):
 def explain() -> str:
     """Provide an explanation summary of the system"""
     return "\n".join(map(lambda l: l.lstrip(), str(MajorSystem.__doc__).split("\n")))
+
+
+class Summary(object):
+    """Help print out a summary of the word mappings.
+
+    Idea is that you use the .print() context manager and feed it the number, words
+    pairings and it will print the information for you. Before the first pair, it can
+    optionally provide a header and after you are done with the printer object, it can
+    possibly print a footer.
+    """
+
+    def __init__(self, nouns_only: bool = False):
+        self._major = PhonemesMajorSystem()
+
+        self._all_nouns: Optional[Set[Any]] = None
+        if nouns_only:
+            self._all_nouns = {x.name().split(".", 1)[0] for x in wn.all_synsets("n")}
+
+    def _header(self) -> str:
+        """Provide opening, header information"""
+        return explain()
+
+    def _footer(self) -> str:
+        """Provide closing, footer information"""
+        return ""
+
+    @contextmanager
+    def printer_object(self):
+        print(self._header())
+
+        def printer(number: str) -> None:
+            words = self._major.number_to_words(number)
+            if self._all_nouns:
+                words = list(filter(lambda word: word in self._all_nouns, words))
+            print(f"{number}: {', '.join(words)}\n")
+
+        yield printer
+
+        print(self._footer())
+
+
+class OrgSummary(Summary):
+    """Provide a summary more suitable for org-mode notes."""
+
+    def _header(self) -> str:
+        return textwrap.dedent(
+            """\
+        #+TITLE:       Number Peg Examples
+        #+DESCRIPTION: Number Peg Collection of numbers to various words
+        #+STARTUP: content noindent hidestars logrefile logredeadline logreschedule
+        #+OPTIONS: toc:t num:nil todo:nil tasks:t pri:nil tags:nil skip:t d:nil ^:{{}}
+
+        * Overview
+
+        {explanation}
+            """
+        ).format(explanation=explain())
+
+    @contextmanager
+    def printer_object(self):
+        print(self._header())
+
+        grouping_size = 10
+        pending_numbers = []
+
+        def org_print_queue():
+            N = len(pending_numbers)
+
+            # Heading first
+            if N > 1:
+                print(f"* {pending_numbers[0]}-{pending_numbers[-1]}\n")
+            elif N:
+                print(f"* {pending_numbers[0]}\n")
+
+            # then the content
+            while pending_numbers:
+                number = pending_numbers.pop(0)
+                words = self._major.number_to_words(number)
+                if self._all_nouns:
+                    words = list(filter(lambda word: word in self._all_nouns, words))
+                print(f"{number}: {', '.join(words)}\n")
+
+        def printer(number: str) -> None:
+            pending_numbers.append(number)
+            if len(pending_numbers) >= grouping_size:
+                org_print_queue()
+
+        yield printer
+
+        # Print remainder
+        org_print_queue()
+
+        print(self._footer())
 
 
 def print_number_words(numbers: Tuple[str], nouns_only: bool = False) -> None:

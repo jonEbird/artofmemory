@@ -77,13 +77,12 @@ def major_system_words(numbers, nouns: bool, explain: bool, quiz: bool):
 
 
 @cli.command()
+@click.option("--org-mode", help="Make the output more org-mode friendly", is_flag=True)
 @click.option("--nouns", help="Filter words to be only nouns", is_flag=True)
 @click.option("--max", "max_", help="Maximum number", metavar="INT", default=100)
 @click.option("--min", "min_", help="Minimum number", metavar="INT", default=0)
-def words_summary(min_: int, max_: int, nouns: bool):
+def words_summary(min_: int, max_: int, nouns: bool, org_mode: bool):
     """Show a large summary of words defaulting from 00 -> 99"""
-    click.echo(major.explain())
-
     input_numbers = []
     # single digit numbers first
     for n in range(min_, max_):
@@ -93,7 +92,13 @@ def words_summary(min_: int, max_: int, nouns: bool):
     for n in range(min_, max_):
         input_numbers.append(f"{n:02}")
 
-    major.print_number_words(input_numbers, nouns_only=nouns)
+    if org_mode:
+        summary = major.OrgSummary(nouns_only=nouns)
+    else:
+        summary = major.Summary(nouns_only=nouns)
+    with summary.printer_object() as printer:
+        for number in input_numbers:
+            printer(number)
 
 
 if __name__ == "__main__":
